@@ -1,0 +1,12 @@
+services:
+  app-drawer:
+    build: .
+    container_name: app-drawer
+    restart: unless-stopped
+    networks:
+      - cloudflare_tunnel
+
+networks:
+  cloudflare_tunnel:
+    external: true
+    name: jrapp-remote-access_default
