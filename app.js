@@ -131,8 +131,8 @@ function transition(update, direction = 'none') {
 
 function setMode(next) {
   if (next === mode) return;
-  // The pill moves right towards Web, so tiles are pushed right; and left when going back Home.
-  const direction = next === 'web' ? 'right' : 'left';
+  // Pages: Web sits to the right of Home, so going to Web slides the tiles off to the left (like a swipe).
+  const direction = next === 'web' ? 'left' : 'right';
   mode = next;
   try { localStorage.setItem('app-drawer-mode', mode); } catch {}
   transition(render, direction);
@@ -291,6 +291,99 @@ function closeFolder() {
     finish();
   });
 }
+
+// --- swipe between Home and Web on touch screens ---------------------------------------------
+// Swipe left to go right to Web, swipe right to go back to Home. Tiles follow the finger while dragging.
+const SWIPE_DISTANCE = 70;
+let swipe = null;
+
+function resetGridDrag(animate) {
+  const from = grid.style.transform;
+  grid.style.transform = '';
+  grid.style.opacity = '';
+  if (animate && from && !REDUCED_MOTION.matches) {
+    grid.animate([{ transform: from }, { transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.2, .8, .2, 1)' });
+  }
+}
+
+document.addEventListener('touchstart', (event) => {
+  const touch = event.touches[0];
+  // Ignore multi-touch, open folders and the screen edges (the browser's own back/forward swipe).
+  if (event.touches.length !== 1 || dialog.open || touch.clientX < 24 || touch.clientX > window.innerWidth - 24) { swipe = null; return; }
+  swipe = { x: touch.clientX, y: touch.clientY, dx: 0, axis: null };
+}, { passive: true });
+
+document.addEventListener('touchmove', (event) => {
+  if (!swipe) return;
+  const touch = event.touches[0];
+  const dx = touch.clientX - swipe.x;
+  const dy = touch.clientY - swipe.y;
+  if (!swipe.axis && Math.hypot(dx, dy) > 10) swipe.axis = Math.abs(dx) > Math.abs(dy) * 1.3 ? 'x' : 'y';
+  if (swipe.axis !== 'x') return;
+  swipe.dx = dx;
+  cancelHold();
+  const target = dx < 0 ? 'web' : 'home';
+  // Drag follows the finger; towards the page you're already on it only stretches a little.
+  const pull = target === mode ? dx * 0.12 : dx * 0.35;
+  grid.style.transform = `translateX(${pull}px)`;
+  grid.style.opacity = String(1 - Math.min(Math.abs(pull) / 320, 0.25));
+}, { passive: true });
+
+function endSwipe() {
+  if (!swipe) return;
+  const { dx, axis } = swipe;
+  swipe = null;
+  const target = dx < 0 ? 'web' : 'home';
+  if (axis === 'x' && Math.abs(dx) > SWIPE_DISTANCE && target !== mode) {
+    resetGridDrag(false);
+    setMode(target);
+  } else {
+    resetGridDrag(true);
+  }
+}
+document.addEventListener('touchend', endSwipe);
+document.addEventListener('touchcancel', endSwipe);
+
+// --- open links in the Chrome app from the installed phone app ----------------------------
+// Only when running as the installed app; in a normal browser tab links behave as usual.
+const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const IS_ANDROID = /Android/i.test(navigator.userAgent);
+const isInstalledApp = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+
+// Android: an intent link opens the full Chrome app, or the default browser if Chrome isn't installed.
+function androidChromeLink(href) {
+  const url = new URL(href);
+  const scheme = url.protocol.replace(':', '');
+  return `intent://${url.host}${url.pathname}${url.search}#Intent;scheme=${scheme};package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url.href)};end`;
+}
+
+// iPhone: Chrome's own link scheme hands the page to the Chrome app.
+function iosChromeLink(href) {
+  return href.replace(/^http(s?):/, (_, secure) => (secure ? 'googlechromes:' : 'googlechrome:'));
+}
+
+// If Chrome doesn't take over within a moment (not installed), open the link normally in Safari instead.
+function openInChromeOrSafari(href) {
+  let leftPage = false;
+  const left = () => { leftPage = true; };
+  document.addEventListener('visibilitychange', left, { once: true });
+  window.addEventListener('pagehide', left, { once: true });
+  window.location.href = iosChromeLink(href);
+  setTimeout(() => {
+    document.removeEventListener('visibilitychange', left);
+    window.removeEventListener('pagehide', left);
+    if (!leftPage && !document.hidden) window.location.href = href;
+  }, 1200);
+}
+
+document.addEventListener('click', (event) => {
+  const link = event.target.closest('a[href^="http"]');
+  if (!link || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
+  if (!isInstalledApp() || !(IS_ANDROID || IS_IOS)) return;
+  event.preventDefault();
+  if (IS_ANDROID) window.location.href = androidChromeLink(link.href);
+  else openInChromeOrSafari(link.href);
+});
 
 // --- events ------------------------------------------------------------------------------
 document.addEventListener('click', (event) => {
