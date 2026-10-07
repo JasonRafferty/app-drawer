@@ -37,6 +37,18 @@
       <!-- app tiles are rendered here by app.js -->
       <section class="grid" id="grid" aria-live="polite"></section>
     </main>
+
+    <dialog class="folder-dialog" id="folder-dialog" aria-labelledby="folder-title">
+      <div class="folder-dialog__head">
+        <div>
+          <p class="folder-kicker">FOLDER</p>
+          <h2 id="folder-title"></h2>
+          <p id="folder-description"></p>
+        </div>
+        <button type="button" class="dialog-close" data-close-folder aria-label="Close folder">×</button>
+      </div>
+      <nav class="folder-links" id="folder-links" aria-label="Folder links"></nav>
+    </dialog>
     <script src="app.js"></script>
   </body>
 </html>

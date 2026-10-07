@@ -42,10 +42,11 @@ body[data-mode="web"] .seg-pill { transform: translateX(100%); }
 /* bento grid ------------------------------------------------------------------ */
 .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 150px; grid-auto-flow: dense; gap: 14px; }
 .tile { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 18px; border-radius: var(--radius); background: var(--tile); box-shadow: 0 1px 2px rgba(18, 24, 38, .05); }
+.tile-link, .folder-open { display: flex; flex: 1; flex-direction: column; justify-content: space-between; min-width: 0; border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-align: left; text-decoration: none; cursor: pointer; }
 
-.app { color: inherit; text-decoration: none; transition: transform .18s ease, box-shadow .18s ease; animation: tile-in .35s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i, 0) * 30ms); }
-.app:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -18px rgba(18, 24, 38, .35); }
-.app:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.drawer-item { color: inherit; transition: transform .18s ease, box-shadow .18s ease; animation: tile-in .35s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i, 0) * 30ms); }
+.drawer-item:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -18px rgba(18, 24, 38, .35); }
+.tile-link:focus-visible, .folder-open:focus-visible, .pin:focus-visible, .dialog-close:focus-visible, .folder-links a:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .ic { width: 40px; height: 40px; }
 .ic img { width: 100%; height: 100%; object-fit: contain; }
 .mono { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 12px; color: #fff; font-weight: 800; font-size: 1.15rem; }
@@ -76,12 +77,43 @@ body[data-mode="web"] .seg-pill { transform: translateX(100%); }
 .feature .dot { top: 24px; right: 24px; }
 .feature .dot[data-state="up"] { box-shadow: 0 0 0 4px rgba(255, 255, 255, .25); }
 
+/* Pins persist in the browser and work with a mouse, keyboard or touch. */
+.pin { position: absolute; right: 12px; bottom: 12px; z-index: 2; display: grid; place-items: center; width: 31px; height: 31px; border: 0; border-radius: 10px; background: transparent; color: #8993a5; font: 1.2rem/1 system-ui, sans-serif; cursor: pointer; opacity: 0; transition: opacity .16s ease, color .16s ease, background .16s ease; }
+.pin:hover, .pin:focus-visible, .pin[aria-pressed="true"] { background: #edf0f5; color: #e3a008; opacity: 1; }
+.drawer-item:hover .pin, .drawer-item:focus-within .pin { opacity: 1; }
+.feature .pin { color: rgba(255,255,255,.75); }
+.feature .pin:hover, .feature .pin:focus-visible, .feature .pin[aria-pressed="true"] { background: rgba(255,255,255,.16); color: #ffe07a; }
+
+/* Apple-style folders --------------------------------------------------------- */
+.folder { overflow: hidden; background: linear-gradient(150deg, #f7f9fc, #e4eaf3); }
+.folder-preview { display: grid; grid-template-columns: repeat(2, 27px); grid-template-rows: repeat(2, 27px); gap: 5px; margin-bottom: 12px; }
+.folder-preview span { display: grid; place-items: center; border-radius: 8px; color: #fff; font-size: .65rem; font-weight: 800; background: linear-gradient(145deg, #4f6df5, #9c63f0); }
+.folder-preview .preview-1 { background: linear-gradient(145deg, #0ea5e9, #2563eb); }
+.folder-preview .preview-2 { background: linear-gradient(145deg, #0f766e, #14b8a6); }
+.folder-preview .preview-3 { background: linear-gradient(145deg, #d97706, #f59e0b); }
+.folder .copy { margin-top: auto; }
+.folder .meta { display: block; margin-top: 9px; }
+.folder .both { display: inline-block; padding: 3px 8px; border-radius: 99px; background: #d8e1ef; color: #60708a; font-size: .68rem; font-weight: 700; }
+.folder-dialog { width: min(460px, calc(100% - 30px)); max-height: min(600px, calc(100vh - 40px)); padding: 0; border: 0; border-radius: 24px; color: var(--ink); background: #fff; box-shadow: 0 25px 70px rgba(15, 23, 42, .35); }
+.folder-dialog::backdrop { background: rgba(15, 23, 42, .48); backdrop-filter: blur(4px); }
+.folder-dialog__head { display: flex; justify-content: space-between; gap: 16px; padding: 26px 26px 18px; border-bottom: 1px solid #edf0f5; }
+.folder-dialog h2 { margin: 0 0 4px; font-size: 1.45rem; letter-spacing: -.03em; }
+.folder-dialog p { margin: 0; color: var(--muted); font-size: .86rem; }
+.folder-kicker { margin-bottom: 4px !important; color: #7e8ba2 !important; font-size: .68rem !important; font-weight: 800; letter-spacing: .12em; }
+.dialog-close { width: 34px; height: 34px; flex: none; border: 0; border-radius: 50%; background: #f0f3f7; color: #566074; font-size: 1.5rem; line-height: 1; cursor: pointer; }
+.folder-links { display: grid; gap: 8px; padding: 16px; }
+.folder-links a { display: grid; grid-template-columns: 42px 1fr auto; align-items: center; gap: 12px; padding: 10px; border-radius: 14px; color: var(--ink); font-size: .92rem; font-weight: 800; text-decoration: none; }
+.folder-links a:hover { background: #f2f5f9; }
+.folder-links a > :last-child { color: #98a1b1; }
+.folder-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; color: #fff; font-weight: 800; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
 @keyframes tile-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
 @keyframes pulse { 50% { opacity: .35; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .app, .dot, .status-dot { animation: none !important; }
-  .seg-pill, .app { transition: none; }
+  .drawer-item, .dot, .status-dot { animation: none !important; }
+  .seg-pill, .drawer-item { transition: none; }
 }
 
 /* tablet and phone ------------------------------------------------------------- */
@@ -102,4 +134,8 @@ body[data-mode="web"] .seg-pill { transform: translateX(100%); }
   .feature .ic { width: 60px; height: 60px; padding: 10px; border-radius: 17px; }
   .feature .copy b { font-size: 1.4rem; }
   .feature .meta { margin-top: 8px; }
+  .pin { right: 8px; bottom: 8px; width: 34px; height: 34px; opacity: 1; background: #edf0f5; }
+  .feature .pin { background: rgba(255,255,255,.16); }
+  .folder-preview { grid-template-columns: repeat(2, 23px); grid-template-rows: repeat(2, 23px); gap: 4px; }
+  .folder-preview span { border-radius: 7px; font-size: .56rem; }
 }
