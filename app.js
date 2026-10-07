@@ -1,45 +1,67 @@
+// Icons: `logo` sits on a white tile, `image` fills the tile, `glyph` draws a symbol on a `theme` gradient.
 const APPS = [
-  { id: 'audiobookshelf', name: 'Audiobookshelf', icon: 'audiobookshelf', theme: ['#f59e0b', '#c2410c'], home: { url: 'http://192.168.0.35:13378', desc: 'Use this for uploads over 100 MB' }, web: { url: 'https://audiobooks.jrapp.co.uk', desc: 'Listen from anywhere' } },
-  { id: 'jellyfin', name: 'Jellyfin', desc: 'Films and TV library', icon: 'jellyfin', theme: ['#7b4dff', '#2fa6ff'], home: { url: 'http://192.168.0.35:8096' } },
-  { id: 'pihole', name: 'Pi-hole', desc: 'DNS and network controls', icon: 'pi-hole', home: { url: 'http://192.168.0.35/admin' } },
-  { id: 'beszel', name: 'Beszel', desc: 'Server health and metrics', icon: 'beszel', home: { url: 'http://192.168.0.35:8090' } },
-  { id: 'bridge-invite', name: 'Bridge House Invite', mono: 'B', theme: ['#ff8a3d', '#ff4f6d'], home: { url: 'http://192.168.0.35:3400', desc: 'RSVP and food voting' }, web: { url: 'https://bridgehouseinvite.siplyapp.co.uk', desc: 'RSVP and food voting' } },
-  { id: 'portainer', name: 'Portainer', desc: 'Manage Docker containers', icon: 'portainer', web: { url: 'https://portainer.jrapp.co.uk' } },
-  { id: 'tutoring', name: 'Tutoring website', desc: 'Jason Rafferty Tutoring', mono: 'T', theme: ['#5b6cff', '#a855f7'], web: { url: 'https://jasonrafferty.github.io' } },
-  { id: 'siply-site', name: 'Siply website', desc: 'Marketing site', mono: 'S', theme: ['#2bd4a4', '#1b8cff'], web: { url: 'https://siplyapp.co.uk' } },
+  { id: 'audiobookshelf', name: 'Audiobookshelf', logo: 'audiobookshelf.svg', theme: ['#f59e0b', '#c2410c'], home: { url: 'http://192.168.0.35:13378', desc: 'Use this for uploads over 100 MB' }, web: { url: 'https://audiobooks.jrapp.co.uk', desc: 'Listen from anywhere' } },
+  { id: 'jellyfin', name: 'Jellyfin', desc: 'Films and TV library', logo: 'jellyfin.svg', theme: ['#7b4dff', '#2fa6ff'], home: { url: 'http://192.168.0.35:8096' } },
+  { id: 'pihole', name: 'Pi-hole', desc: 'DNS and network controls', logo: 'pi-hole.svg', home: { url: 'http://192.168.0.35/admin' } },
+  { id: 'beszel', name: 'Beszel', desc: 'Server health and metrics', logo: 'beszel.svg', home: { url: 'http://192.168.0.35:8090' } },
+  { id: 'bridge-invite', name: 'Bridge House Invite', desc: 'RSVP and food voting', image: 'bridge-house.svg', web: { url: 'https://bridgehouseinvite.siplyapp.co.uk' } },
+  { id: 'portainer', name: 'Portainer', desc: 'Manage Docker containers', logo: 'portainer.svg', home: { url: 'https://192.168.0.35:9443', check: false }, web: { url: 'https://portainer.jrapp.co.uk' } },
+  { id: 'cloudflare', name: 'Cloudflare', desc: 'Manage your Cloudflare account', logo: 'cloudflare.svg', home: { url: 'https://dash.cloudflare.com/579bd1d79bb2eab5ff06e1479b504af9/home', check: false }, web: { url: 'https://dash.cloudflare.com/579bd1d79bb2eab5ff06e1479b504af9/home', check: false } },
+  { id: 'tutoring', name: 'Tutoring website', desc: 'Jason Rafferty Tutoring', glyph: 'cap', theme: ['#818cf8', '#6d28d9'], web: { url: 'https://jasonrafferty.github.io' } },
+  { id: 'student-arcade', name: 'Student Game Arcade', desc: 'Games made by your students', glyph: 'gamepad', theme: ['#4ade80', '#0891b2'], web: { url: 'https://jasonrafferty.github.io/student-game-arcade/' } },
+  { id: 'siply-site', name: 'Siply website', desc: 'Marketing site', image: 'siply.svg', web: { url: 'https://siplyapp.co.uk' } },
 ];
+
+const SIPLY = ['#2a2a2a', '#111111', '#dfff2f'];
 
 // Folders keep related links out of the main drawer, much like an iPhone home-screen folder.
 const FOLDERS = [
-  { id: 'siply-environments', name: 'Siply environments', desc: 'Dev, UAT and admin tools', mode: 'web', preview: ['D', 'U', 'DA', 'UA'], children: [
-    { name: 'Siply Dev', url: 'https://dev.siplyapp.co.uk', mono: 'D', color: '#23a6f0' },
-    { name: 'Siply UAT', url: 'https://uat.siplyapp.co.uk', mono: 'U', color: '#8b5cf6' },
-    { name: 'Siply Dev Admin', url: 'https://dev-admin.siplyapp.co.uk', mono: 'DA', color: '#0f766e' },
-    { name: 'Siply UAT Admin', url: 'https://uat-admin.siplyapp.co.uk', mono: 'UA', color: '#d97706' },
+  { id: 'siply-environments', name: 'Siply environments', desc: 'Dev, UAT and admin tools', mode: 'web', children: [
+    { name: 'Siply Dev', url: 'https://dev.siplyapp.co.uk', image: 'siply-app.svg', badge: 'DEV' },
+    { name: 'Siply UAT', url: 'https://uat.siplyapp.co.uk', image: 'siply-app.svg', badge: 'UAT' },
+    { name: 'Siply Dev Admin', url: 'https://dev-admin.siplyapp.co.uk', glyph: 'shield', theme: SIPLY, badge: 'DEV' },
+    { name: 'Siply UAT Admin', url: 'https://uat-admin.siplyapp.co.uk', glyph: 'shield', theme: SIPLY, badge: 'UAT' },
   ] },
-  { id: 'projects', name: 'Projects', desc: 'Games, tools and source code', mode: 'web', preview: ['♠', '↟', '£', '⌘'], children: [
-    { name: 'Blackjack Game', url: 'https://jasonrafferty.github.io/blackjack-game/', mono: '♠', color: '#111827' },
-    { name: 'Traffic Notifier', url: 'https://jasonrafferty.github.io/traffic-notifier/', mono: '↟', color: '#2563eb' },
-    { name: 'Take-Home Calculator', url: 'https://jasonrafferty.github.io/take-home-calculator/', mono: '£', color: '#15803d' },
-    { name: 'Bridge House source', url: 'https://github.com/JasonRafferty/bridge-house-invite', mono: 'B', color: '#ea580c' },
-    { name: 'App Drawer source', url: 'https://github.com/JasonRafferty/app-drawer', mono: '⌘', color: '#475569' },
+  { id: 'projects', name: 'Projects', desc: 'Games, tools and source code', mode: 'web', children: [
+    { name: 'Blackjack Game', url: 'https://jasonrafferty.github.io/blackjack-game/', logo: 'blackjack.png' },
+    { name: 'Traffic Notifier', url: 'https://jasonrafferty.github.io/traffic-notifier/', glyph: 'cone', theme: ['#60a5fa', '#1d4ed8'] },
+    { name: 'Take-Home Calculator', url: 'https://jasonrafferty.github.io/take-home-calculator/', glyph: 'calculator', theme: ['#4ade80', '#15803d'] },
+    { name: 'Bridge House source', url: 'https://github.com/JasonRafferty/bridge-house-invite', logo: 'github.svg' },
   ] },
 ];
 
+// Simple line symbols for sites without their own icon (24 × 24, drawn with the current colour).
+const GLYPHS = {
+  cap: '<path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 2.2 9 2.2 12 0v-5"/>',
+  gamepad: '<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 12.5h4M9 10.5v4"/><path d="M15.5 11h.01M17.5 14h.01"/>',
+  cone: '<path d="M9.5 3h5l4.5 17h-14Z"/><path d="M7.8 11h8.4M6.6 15.5h10.8M3 20h18"/>',
+  calculator: '<rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M8.5 6.5h7"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/>',
+  shield: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6Z"/><path d="m9 12 2.2 2.2L15.5 10"/>',
+};
+
 const FEATURED = { home: 'jellyfin', web: 'audiobookshelf' };
-const MODES = { home: { note: 'opens on your home Wi-Fi', away: 'Not reachable. Are you on your home Wi-Fi?' }, web: { note: 'works from anywhere', away: 'Nothing reachable. Check your connection.' } };
-const ICON_CDN = 'https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons/svg/';
+const MODES = {
+  home: { note: 'opens on your home Wi-Fi', away: 'Not reachable. Are you on your home Wi-Fi?' },
+  web: { note: 'works from anywhere', away: 'Nothing reachable. Check your connection.' },
+};
+const ICON_DIR = 'assets/icons/';
 const CHECK_TIMEOUT_MS = 4000;
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
+
 const $ = (selector) => document.querySelector(selector);
 const grid = $('#grid');
-const status = new Map();
+const dialog = $('#folder-dialog');
+const status = new Map(); // `${mode}:${id}` for apps, `${mode}:${folderId}:${index}` for folder links
 let mode = readMode();
 let pins = readPins();
+let openFolderId = null;
 
 function readMode() { try { return localStorage.getItem('app-drawer-mode') === 'home' ? 'home' : 'web'; } catch { return 'web'; } }
 function readPins() { try { const saved = JSON.parse(localStorage.getItem('app-drawer-pins') || '[]'); return new Set(Array.isArray(saved) ? saved : []); } catch { return new Set(); } }
 function savePins() { try { localStorage.setItem('app-drawer-pins', JSON.stringify([...pins])); } catch {} }
 function appsFor(activeMode) { return APPS.filter((app) => app[activeMode]); }
+// Links marked `check: false` can't be checked from the browser (self-signed certificate, or the site blocks it).
+function checkedApps(activeMode) { return appsFor(activeMode).filter((app) => app[activeMode].check !== false); }
 function foldersFor(activeMode) { return FOLDERS.filter((folder) => folder.mode === activeMode); }
 function itemsFor(activeMode) { return [...appsFor(activeMode), ...foldersFor(activeMode)]; }
 
@@ -52,58 +74,221 @@ function ordered(items) {
   });
 }
 
+// --- markup ------------------------------------------------------------------------
 function hostLabel(url, where) { const parsed = new URL(url); return where === 'home' ? ((parsed.port ? `:${parsed.port}` : '') + (parsed.pathname === '/' ? '' : parsed.pathname) || parsed.hostname) : parsed.hostname.replace(/^www\./, ''); }
-function iconHtml(app) { if (app.icon) return `<img src="${ICON_CDN}${app.icon}.svg" alt="" loading="lazy" />`; const [a, b] = app.theme ?? ['#64748b', '#334155']; return `<span class="mono" style="background:linear-gradient(140deg,${a},${b})">${app.mono}</span>`; }
+function iconHtml(item) {
+  const badge = item.badge ? `<span class="badge">${item.badge}</span>` : '';
+  if (item.logo) return `<span class="icon logo"><img src="${ICON_DIR}${item.logo}" alt="" /></span>${badge}`;
+  if (item.image) return `<span class="icon full"><img src="${ICON_DIR}${item.image}" alt="" /></span>${badge}`;
+  const [a, b, ink = '#fff'] = item.theme ?? ['#64748b', '#334155'];
+  return `<span class="icon glyph" style="--ga:${a};--gb:${b};--ink:${ink}"><svg viewBox="0 0 24 24" aria-hidden="true">${GLYPHS[item.glyph] ?? ''}</svg></span>${badge}`;
+}
 function pinButton(item) { const pinned = pins.has(item.id); return `<button class="pin" type="button" data-toggle-pin="${item.id}" aria-pressed="${pinned}" title="${pinned ? 'Unpin' : 'Pin'} ${item.name}"><span aria-hidden="true">${pinned ? '★' : '☆'}</span><span class="sr-only">${pinned ? 'Unpin' : 'Pin'} ${item.name}</span></button>`; }
+const offlineTag = '<span class="offline-tag">Offline</span>';
 
 function tileHtml(app, featured) {
   const link = app[mode]; const desc = link.desc ?? app.desc; const both = app.home && app.web;
-  const style = featured && app.theme ? ` style="--a:${app.theme[0]};--b:${app.theme[1]}"` : '';
-  const state = status.get(`${mode}:${app.id}`) ?? 'checking';
-  return `<article class="tile drawer-item app${featured ? ' feature' : ''}" data-item="${app.id}"${style}><a class="tile-link" href="${link.url}" target="_blank" rel="noreferrer"><span class="dot" data-state="${state}" title="Checking"></span><span class="ic">${iconHtml(app)}</span><span class="copy"><b>${app.name}</b><small>${desc}</small><span class="meta"><span class="host">${hostLabel(link.url, mode)}</span>${both ? '<span class="both">Home + Web</span>' : ''}</span></span></a>${pinButton(app)}</article>`;
+  const vars = [`view-transition-name:vt-${app.id}`];
+  if (featured && app.theme) vars.push(`--a:${app.theme[0]}`, `--b:${app.theme[1]}`);
+  const state = link.check === false ? 'unchecked' : status.get(`${mode}:${app.id}`) ?? 'checking';
+  return `<article class="tile drawer-item app${featured ? ' feature' : ''}" data-item="${app.id}" data-state="${state}" style="${vars.join(';')}"><a class="tile-link" href="${link.url}" target="_blank" rel="noreferrer"><span class="dot" data-state="${state}" title="Checking"></span><span class="ic">${iconHtml(app)}</span><span class="copy"><b>${app.name}</b><small>${desc}</small><span class="meta"><span class="host">${hostLabel(link.url, mode)}</span>${both ? '<span class="both">Home + Web</span>' : ''}</span></span>${offlineTag}</a>${pinButton(app)}</article>`;
 }
 
 function folderHtml(folder) {
-  return `<article class="tile drawer-item folder" data-item="${folder.id}"><button class="folder-open" type="button" data-open-folder="${folder.id}" aria-haspopup="dialog"><span class="folder-preview" aria-hidden="true">${folder.preview.map((mark, index) => `<span class="preview-${index}">${mark}</span>`).join('')}</span><span class="copy"><b>${folder.name}</b><small>${folder.desc}</small><span class="meta"><span class="both">${folder.children.length} links</span></span></span></button>${pinButton(folder)}</article>`;
+  const minis = folder.children.slice(0, 9).map((child) => `<span class="mini">${iconHtml(child)}</span>`).join('');
+  return `<article class="tile drawer-item folder" data-item="${folder.id}" data-state="${folderState(folder)}" style="view-transition-name:vt-${folder.id}"><button class="folder-open" type="button" data-open-folder="${folder.id}" aria-haspopup="dialog"><span class="dot" data-state="${folderState(folder)}"></span><span class="folder-preview" aria-hidden="true">${minis}</span><span class="copy"><b>${folder.name}</b><small>${folder.desc}</small></span></button>${pinButton(folder)}</article>`;
 }
 
+// --- render --------------------------------------------------------------------------
 function render() {
   const list = ordered(itemsFor(mode));
   const featured = list.find((item) => !item.children && pins.has(item.id)) || list.find((item) => item.id === FEATURED[mode]);
-  grid.innerHTML = list.map((item) => item.children ? folderHtml(item) : tileHtml(item, item === featured)).join('');
-  grid.querySelectorAll('.drawer-item').forEach((tile, index) => tile.style.setProperty('--i', index));
+  const items = featured ? [featured, ...list.filter((item) => item !== featured)] : list;
+  grid.innerHTML = items.map((item) => item.children ? folderHtml(item) : tileHtml(item, item === featured)).join('');
   document.body.dataset.mode = mode;
   document.querySelectorAll('[data-set-mode]').forEach((button) => button.setAttribute('aria-checked', String(button.dataset.setMode === mode)));
   balance(); renderStatus(); checkAll();
 }
 
-function setMode(next) { if (next === mode) return; mode = next; try { localStorage.setItem('app-drawer-mode', mode); } catch {} render(); }
-function togglePin(id) { if (pins.has(id)) pins.delete(id); else pins.add(id); savePins(); render(); }
+// Animate a DOM change with the browser's View Transitions API where it exists; otherwise just apply it.
+function transition(update, direction = 'none') {
+  if (!document.startViewTransition || REDUCED_MOTION.matches) { update(); return; }
+  document.documentElement.dataset.dir = direction;
+  document.startViewTransition(update).finished.finally(() => { delete document.documentElement.dataset.dir; });
+}
 
+function setMode(next) {
+  if (next === mode) return;
+  // The pill moves right towards Web, so tiles are pushed right; and left when going back Home.
+  const direction = next === 'web' ? 'right' : 'left';
+  mode = next;
+  try { localStorage.setItem('app-drawer-mode', mode); } catch {}
+  transition(render, direction);
+}
+
+function togglePin(id) { if (pins.has(id)) pins.delete(id); else pins.add(id); savePins(); transition(render); }
+
+// Stretch tiles so the grid never ends with a gap, beside the big tile or on the last row.
 function balance() {
   const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
   const tiles = [...grid.querySelectorAll('.drawer-item')];
-  tiles.forEach((tile) => { tile.style.gridColumn = ''; tile.classList.remove('wide'); });
+  tiles.forEach((tile) => { tile.style.gridColumn = ''; tile.style.gridRow = ''; tile.classList.remove('wide'); });
   const feature = tiles.find((tile) => tile.classList.contains('feature'));
   const featureSpansRows = feature && getComputedStyle(feature).gridRowEnd.includes('2');
-  const small = tiles.filter((tile) => tile !== feature); const besideFeature = featureSpansRows ? (cols - 2) * 2 : 0;
-  const leftover = Math.max(0, small.length - besideFeature) % cols;
-  if (!leftover) return;
-  small.slice(-leftover).forEach((tile, index) => { const span = Math.floor(cols / leftover) + (index < cols % leftover ? 1 : 0); if (span > 1) { tile.style.gridColumn = `span ${span}`; tile.classList.add('wide'); } });
+  const small = tiles.filter((tile) => tile !== feature);
+  const stretch = (list, width) => list.forEach((tile, index) => {
+    const span = Math.floor(width / list.length) + (index < width % list.length ? 1 : 0);
+    if (span > 1) { tile.style.gridColumn = `span ${span}`; tile.classList.add('wide'); }
+  });
+
+  const sideCols = featureSpansRows ? cols - 2 : 0;
+  const beside = small.slice(0, sideCols * 2);
+  const rest = small.slice(beside.length);
+  if (sideCols && beside.length) {
+    if (beside.length <= sideCols) {
+      stretch(beside, sideCols);
+      beside.forEach((tile) => { tile.style.gridRow = 'span 2'; });
+    } else if (beside.length % sideCols) {
+      stretch(beside.slice(-(beside.length % sideCols)), sideCols);
+    }
+  }
+  const leftover = rest.length % cols;
+  if (leftover) stretch(rest.slice(-leftover), cols);
 }
 
+// --- opening sequence: tiles ripple outwards from the big tile ------------------------
+function ripple() {
+  const tiles = [...grid.querySelectorAll('.drawer-item')];
+  if (!tiles.length) return;
+  const origin = (grid.querySelector('.feature') ?? tiles[0]).getBoundingClientRect();
+  const ox = origin.left + origin.width / 2; const oy = origin.top + origin.height / 2;
+  tiles.forEach((tile) => {
+    const r = tile.getBoundingClientRect();
+    const distance = Math.hypot(r.left + r.width / 2 - ox, r.top + r.height / 2 - oy);
+    tile.style.setProperty('--delay', `${100 + distance * 0.16}ms`);
+  });
+  document.body.classList.add('intro');
+  setTimeout(() => document.body.classList.remove('intro'), 900);
+}
+
+// --- live status -----------------------------------------------------------------------
 async function ping(url) { const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), CHECK_TIMEOUT_MS); try { await fetch(url, { mode: 'no-cors', cache: 'no-store', signal: ctrl.signal }); return 'up'; } catch { return 'down'; } finally { clearTimeout(timer); } }
-function checkAll() { const activeMode = mode; appsFor(activeMode).forEach(async (app) => { const key = `${activeMode}:${app.id}`; if (!status.has(key)) status.set(key, 'checking'); const result = await ping(app[activeMode].url); status.set(key, result); if (activeMode !== mode) return; const dot = grid.querySelector(`[data-item="${app.id}"] .dot`); if (dot) { dot.dataset.state = result; dot.title = result === 'up' ? 'Online' : 'Not reachable'; } renderStatus(); }); }
-function renderStatus() { const apps = appsFor(mode); const states = apps.map((app) => status.get(`${mode}:${app.id}`) ?? 'checking'); const up = states.filter((state) => state === 'up').length; let state = 'ok'; let text = `All ${apps.length} online · ${MODES[mode].note}`; if (states.includes('checking')) { state = 'checking'; text = `Checking ${apps.length} services…`; } else if (up === 0) { state = 'down'; text = MODES[mode].away; } else if (up < apps.length) { state = 'partial'; text = `${up} of ${apps.length} online · ${MODES[mode].note}`; } $('#status').dataset.state = state; $('#status-text').textContent = text; }
 
-function openFolder(id) {
-  const folder = FOLDERS.find((item) => item.id === id); if (!folder) return;
-  $('#folder-title').textContent = folder.name; $('#folder-description').textContent = folder.desc;
-  $('#folder-links').innerHTML = folder.children.map((child) => `<a href="${child.url}" target="_blank" rel="noreferrer"><span class="folder-icon" style="background:${child.color}">${child.mono}</span><span>${child.name}</span><span aria-hidden="true">↗</span></a>`).join('');
-  const dialog = $('#folder-dialog'); if (typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open', '');
+function folderState(folder, activeMode = mode) {
+  const states = folder.children.map((_, index) => status.get(`${activeMode}:${folder.id}:${index}`) ?? 'checking');
+  if (states.includes('checking')) return 'checking';
+  const up = states.filter((state) => state === 'up').length;
+  return up === states.length ? 'up' : up === 0 ? 'down' : 'partial';
 }
 
-document.addEventListener('click', (event) => { const modeButton = event.target.closest('[data-set-mode]'); if (modeButton) { setMode(modeButton.dataset.setMode); return; } const pin = event.target.closest('[data-toggle-pin]'); if (pin) { togglePin(pin.dataset.togglePin); return; } const folder = event.target.closest('[data-open-folder]'); if (folder) openFolder(folder.dataset.openFolder); });
-$('#folder-dialog').addEventListener('click', (event) => { if (event.target === $('#folder-dialog') || event.target.closest('[data-close-folder]')) $('#folder-dialog').close(); });
+function paint(el, state) {
+  if (!el) return;
+  const dot = el.querySelector('.dot');
+  const cameOnline = el.dataset.state === 'checking' && state === 'up';
+  el.dataset.state = state;
+  if (!dot) return;
+  dot.dataset.state = state;
+  dot.title = { up: 'Online', down: 'Not reachable', partial: 'Some not reachable', checking: 'Checking' }[state];
+  if (cameOnline) { dot.classList.remove('lit'); void dot.offsetWidth; dot.classList.add('lit'); }
+}
+
+function checkAll() {
+  const activeMode = mode;
+  checkedApps(activeMode).forEach(async (app) => {
+    const key = `${activeMode}:${app.id}`;
+    if (!status.has(key)) status.set(key, 'checking');
+    const result = await ping(app[activeMode].url);
+    status.set(key, result);
+    if (activeMode !== mode) return;
+    paint(grid.querySelector(`[data-item="${app.id}"]`), result);
+    renderStatus();
+  });
+  foldersFor(activeMode).forEach((folder) => folder.children.forEach(async (child, index) => {
+    const key = `${activeMode}:${folder.id}:${index}`;
+    if (!status.has(key)) status.set(key, 'checking');
+    const result = await ping(child.url);
+    status.set(key, result);
+    if (activeMode !== mode) return;
+    paint(grid.querySelector(`[data-item="${folder.id}"]`), folderState(folder));
+    if (openFolderId === folder.id) paint(dialog.querySelector(`[data-child="${index}"]`), result);
+  }));
+}
+
+function renderStatus() {
+  const apps = checkedApps(mode);
+  const states = apps.map((app) => status.get(`${mode}:${app.id}`) ?? 'checking');
+  const up = states.filter((state) => state === 'up').length;
+  let state = 'ok'; let text = `All ${apps.length} online · ${MODES[mode].note}`;
+  if (states.includes('checking')) { state = 'checking'; text = `Checking ${apps.length} services…`; }
+  else if (up === 0) { state = 'down'; text = MODES[mode].away; }
+  else if (up < apps.length) { state = 'partial'; text = `${up} of ${apps.length} online · ${MODES[mode].note}`; }
+  $('#status').dataset.state = state; $('#status-text').textContent = text;
+}
+
+// --- iPhone-style folders: zoom open from the tile, zoom back into it -------------------
+const OPEN_EASE = 'cubic-bezier(.2, .9, .25, 1.04)';
+const CLOSE_EASE = 'cubic-bezier(.4, 0, .6, 1)';
+
+function zoomFrames(fromRect, panel) {
+  const to = panel.getBoundingClientRect();
+  const from = `translate(${fromRect.left - to.left}px, ${fromRect.top - to.top}px) scale(${fromRect.width / to.width}, ${fromRect.height / to.height})`;
+  return [{ transform: from, opacity: 0.6 }, { transform: 'none', opacity: 1 }];
+}
+
+function openFolder(id, trigger) {
+  const folder = FOLDERS.find((item) => item.id === id); if (!folder) return;
+  const tile = trigger.closest('.drawer-item');
+  openFolderId = id;
+  $('#folder-title').textContent = folder.name;
+  $('#folder-links').innerHTML = folder.children.map((child, index) => {
+    const state = status.get(`${mode}:${folder.id}:${index}`) ?? 'checking';
+    return `<a class="folder-app" href="${child.url}" target="_blank" rel="noreferrer" data-child="${index}" data-state="${state}" style="--i:${index}"><span class="app-icon">${iconHtml(child)}</span><span class="dot" data-state="${state}"></span><span class="label">${child.name}</span>${offlineTag}</a>`;
+  }).join('');
+
+  dialog.showModal();
+  document.body.classList.add('folder-open');
+  tile.classList.add('is-opening');
+  requestAnimationFrame(() => dialog.classList.add('is-open'));
+  if (!REDUCED_MOTION.matches) {
+    const panel = dialog.querySelector('.folder-panel');
+    panel.animate(zoomFrames(tile.querySelector('.folder-preview').getBoundingClientRect(), panel), { duration: 300, easing: OPEN_EASE });
+  }
+}
+
+function closeFolder() {
+  if (!dialog.open || dialog.classList.contains('is-closing')) return;
+  const tile = grid.querySelector(`[data-item="${openFolderId}"]`);
+  const finish = () => {
+    dialog.classList.remove('is-open', 'is-closing');
+    dialog.close();
+    document.body.classList.remove('folder-open');
+    tile?.classList.remove('is-opening');
+    tile?.querySelector('.folder-open')?.focus({ preventScroll: true });
+    openFolderId = null;
+  };
+  dialog.classList.add('is-closing');
+  dialog.classList.remove('is-open');
+  if (REDUCED_MOTION.matches || !tile) { setTimeout(finish, 100); return; }
+  const panel = dialog.querySelector('.folder-panel');
+  const frames = zoomFrames(tile.querySelector('.folder-preview').getBoundingClientRect(), panel).reverse();
+  frames[1].opacity = 0;
+  panel.animate(frames, { duration: 200, easing: CLOSE_EASE, fill: 'forwards' }).finished.then(() => {
+    panel.getAnimations().forEach((animation) => animation.cancel());
+    finish();
+  });
+}
+
+// --- events ------------------------------------------------------------------------------
+document.addEventListener('click', (event) => {
+  const modeButton = event.target.closest('[data-set-mode]'); if (modeButton) { setMode(modeButton.dataset.setMode); return; }
+  const pin = event.target.closest('[data-toggle-pin]'); if (pin) { togglePin(pin.dataset.togglePin); return; }
+  const folder = event.target.closest('[data-open-folder]'); if (folder) openFolder(folder.dataset.openFolder, folder);
+});
+// Like iOS: tap anywhere outside the panel to close. Esc closes too.
+dialog.addEventListener('click', (event) => { if (event.target.closest('[data-close-folder]') || !event.target.closest('.folder-panel')) closeFolder(); });
+dialog.addEventListener('cancel', (event) => { event.preventDefault(); closeFolder(); });
 window.addEventListener('resize', balance);
-render(); setInterval(checkAll, 60_000);
+
+render();
+ripple();
+setInterval(checkAll, 60_000);
