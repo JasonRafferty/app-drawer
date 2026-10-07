@@ -39,12 +39,14 @@
     </main>
 
     <dialog class="folder-dialog" id="folder-dialog" aria-labelledby="folder-title">
+      <div class="folder-scrim" aria-hidden="true"></div>
       <h2 class="folder-title" id="folder-title"></h2>
       <div class="folder-panel">
         <nav class="folder-apps" id="folder-links" aria-label="Apps in this folder"></nav>
       </div>
       <button type="button" class="sr-only" data-close-folder>Close folder</button>
     </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="app.js"></script>
   </body>
 </html>

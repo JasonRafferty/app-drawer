@@ -55,6 +55,7 @@ const status = new Map(); // `${mode}:${id}` for apps, `${mode}:${folderId}:${in
 let mode = readMode();
 let pins = readPins();
 let openFolderId = null;
+document.body.classList.add('preload');
 
 function readMode() { try { return localStorage.getItem('app-drawer-mode') === 'home' ? 'home' : 'web'; } catch { return 'web'; } }
 function readPins() { try { const saved = JSON.parse(localStorage.getItem('app-drawer-pins') || '[]'); return new Set(Array.isArray(saved) ? saved : []); } catch { return new Set(); } }
@@ -249,10 +250,9 @@ function openFolder(id, trigger) {
   document.body.classList.add('folder-open');
   tile.classList.add('is-opening');
   requestAnimationFrame(() => dialog.classList.add('is-open'));
-  if (!REDUCED_MOTION.matches) {
-    const panel = dialog.querySelector('.folder-panel');
-    panel.animate(zoomFrames(tile.querySelector('.folder-preview').getBoundingClientRect(), panel), { duration: 300, easing: OPEN_EASE });
-  }
+  const panel = dialog.querySelector('.folder-panel');
+  if (REDUCED_MOTION.matches) panel.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: 'ease-out' });
+  else panel.animate(zoomFrames(tile.querySelector('.folder-preview').getBoundingClientRect(), panel), { duration: 300, easing: OPEN_EASE });
 }
 
 function closeFolder() {
@@ -268,10 +268,12 @@ function closeFolder() {
   };
   dialog.classList.add('is-closing');
   dialog.classList.remove('is-open');
-  if (REDUCED_MOTION.matches || !tile) { setTimeout(finish, 100); return; }
   const panel = dialog.querySelector('.folder-panel');
-  const frames = zoomFrames(tile.querySelector('.folder-preview').getBoundingClientRect(), panel).reverse();
-  frames[1].opacity = 0;
+  let frames = [{ opacity: 1 }, { opacity: 0 }];
+  if (tile && !REDUCED_MOTION.matches) {
+    frames = zoomFrames(tile.querySelector('.folder-preview').getBoundingClientRect(), panel).reverse();
+    frames[1].opacity = 0;
+  }
   panel.animate(frames, { duration: 200, easing: CLOSE_EASE, fill: 'forwards' }).finished.then(() => {
     panel.getAnimations().forEach((animation) => animation.cancel());
     finish();
@@ -289,6 +291,46 @@ dialog.addEventListener('click', (event) => { if (event.target.closest('[data-cl
 dialog.addEventListener('cancel', (event) => { event.preventDefault(); closeFolder(); });
 window.addEventListener('resize', balance);
 
+// --- touch: press-and-hold to pin ----------------------------------------------------------
+const toast = $('#toast');
+let toastTimer;
+function showToast(text) {
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+}
+
+const HOLD_MS = 500;
+let hold = null;
+let held = false;
+grid.addEventListener('pointerdown', (event) => {
+  const item = event.target.closest('.drawer-item');
+  if (!item || event.pointerType === 'mouse' || event.target.closest('.pin')) return;
+  held = false;
+  hold = { x: event.clientX, y: event.clientY, timer: setTimeout(() => {
+    held = true;
+    navigator.vibrate?.(12);
+    const id = item.dataset.item;
+    togglePin(id);
+    showToast(pins.has(id) ? 'Pinned to the top' : 'Unpinned');
+  }, HOLD_MS) };
+});
+const cancelHold = () => { if (hold) clearTimeout(hold.timer); hold = null; };
+grid.addEventListener('pointerup', cancelHold);
+grid.addEventListener('pointercancel', cancelHold);
+grid.addEventListener('pointermove', (event) => { if (hold && Math.hypot(event.clientX - hold.x, event.clientY - hold.y) > 10) cancelHold(); });
+// A long press shouldn't also open the app or folder.
+grid.addEventListener('click', (event) => { if (held) { event.preventDefault(); event.stopPropagation(); held = false; } }, true);
+grid.addEventListener('contextmenu', (event) => { if (event.target.closest('.drawer-item')) event.preventDefault(); });
+// iOS Safari only shows :active press styles when the page listens for touches.
+document.addEventListener('touchstart', () => {}, { passive: true });
+
 render();
-ripple();
+const fontsReady = document.fonts?.ready ?? Promise.resolve();
+Promise.race([fontsReady, new Promise((resolve) => setTimeout(resolve, 500))]).then(() => {
+  balance();
+  document.body.classList.remove('preload');
+  ripple();
+});
 setInterval(checkAll, 60_000);
