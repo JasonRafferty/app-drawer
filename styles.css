@@ -136,8 +136,8 @@ body.folder-open { overflow: hidden; }
 .folder-dialog.is-open .folder-title { opacity: 1; transform: none; transition-delay: .04s; }
 .folder-panel { width: min(400px, 100%); padding: 28px 20px 24px; border-radius: 40px; background: rgba(255, 255, 255, .74); -webkit-backdrop-filter: blur(30px) saturate(1.6); backdrop-filter: blur(30px) saturate(1.6); box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .45); transform-origin: top left; will-change: transform, opacity; }
 .folder-apps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px 10px; }
-.folder-app { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--ink); text-align: center; text-decoration: none; opacity: 0; }
-.folder-dialog.is-open .folder-app { animation: icon-pop .28s cubic-bezier(.2, .9, .3, 1.25) both; animation-delay: calc(80ms + var(--i, 0) * 25ms); }
+.folder-app { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--ink); text-align: center; text-decoration: none; }
+.folder-app.pop { animation: icon-pop .28s cubic-bezier(.2, .9, .3, 1.25) both; animation-delay: calc(80ms + var(--i, 0) * 25ms); }
 .app-icon { position: relative; flex: none; width: 64px; height: 64px; transition: transform .15s ease, filter .3s ease, opacity .3s ease; }
 .app-icon .icon { border-radius: 18px; box-shadow: 0 8px 16px -8px rgba(0, 0, 0, .4); }
 .app-icon .icon.logo { padding: 13px; background: #fff; }
@@ -185,12 +185,16 @@ html[data-dir="left"]::view-transition-new(*):only-child { animation: in-from-ri
 @media (prefers-reduced-motion: reduce) {
   body.intro h1, body.intro .status, body.intro .seg, body.intro .drawer-item { animation: fade .25s ease both; animation-delay: 0s; }
   .dot, .status-dot { animation: none !important; }
-  .folder-dialog.is-open .folder-app { animation: fade .2s ease both; }
+  .folder-app.pop { animation: fade .2s ease both; animation-delay: 0s; }
   .drawer-item:active, .folder-app:active .app-icon { transform: none; }
   .seg-pill { transition-duration: .15s; }
   .folder-title { transform: none; }
 }
-@keyframes fade { from { opacity: 0; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* Reduce Motion: switching Home / Web is a quick cross-fade of the whole grid, no sliding */
+html[data-dir="fade"] .drawer-item { view-transition-name: none !important; }
+html[data-dir="fade"]::view-transition-old(root), html[data-dir="fade"]::view-transition-new(root) { animation-duration: .2s; }
 
 /* tablet and phone ------------------------------------------------------------- */
 @media (max-width: 860px) {

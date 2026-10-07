@@ -111,10 +111,22 @@ function render() {
 }
 
 // Animate a DOM change with the browser's View Transitions API where it exists; otherwise just apply it.
+// Animate a change to the grid. Uses the browser's View Transitions where available (tiles morph and slide);
+// otherwise slides the grid out and back in by hand. With Reduce Motion it's a quick cross-fade instead.
 function transition(update, direction = 'none') {
-  if (!document.startViewTransition || REDUCED_MOTION.matches) { update(); return; }
-  document.documentElement.dataset.dir = direction;
-  document.startViewTransition(update).finished.finally(() => { delete document.documentElement.dataset.dir; });
+  const reduced = REDUCED_MOTION.matches;
+  if (document.startViewTransition) {
+    document.documentElement.dataset.dir = reduced ? 'fade' : direction;
+    document.startViewTransition(update).finished.finally(() => { delete document.documentElement.dataset.dir; });
+    return;
+  }
+  const shift = reduced || direction === 'none' ? 0 : direction === 'right' ? 40 : -40;
+  grid.getAnimations().forEach((animation) => animation.finish());
+  grid.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateX(${shift}px)` }], { duration: 140, easing: 'ease-in' })
+    .finished.then(() => {
+      update();
+      grid.animate([{ opacity: 0, transform: `translateX(${-shift}px)` }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.2, .8, .2, 1)' });
+    });
 }
 
 function setMode(next) {
@@ -242,7 +254,7 @@ function openFolder(id, trigger) {
   $('#folder-title').textContent = folder.name;
   $('#folder-links').innerHTML = folder.children.map((child, index) => {
     const state = status.get(`${mode}:${folder.id}:${index}`) ?? 'checking';
-    return `<a class="folder-app" href="${child.url}" target="_blank" rel="noreferrer" data-child="${index}" data-state="${state}" style="--i:${index}"><span class="app-icon">${iconHtml(child)}</span><span class="dot" data-state="${state}"></span><span class="label">${child.name}</span>${offlineTag}</a>`;
+    return `<a class="folder-app pop" href="${child.url}" target="_blank" rel="noreferrer" data-child="${index}" data-state="${state}" style="--i:${index}"><span class="app-icon">${iconHtml(child)}</span><span class="dot" data-state="${state}"></span><span class="label">${child.name}</span>${offlineTag}</a>`;
   }).join('');
 
   dialog.showModal();
