@@ -19,10 +19,14 @@ body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--bg); }
 h1, p { margin: 0; }
 small { display: block; }
 
-.shell { width: min(1100px, calc(100% - 32px)); margin: 0 auto; padding: 44px 0 64px; }
+.shell { width: min(1100px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 64px; }
 
 /* header: title, live status and the Home / Web switch ----------------------- */
-.top { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 0 -16px 22px; padding: max(16px, env(safe-area-inset-top)) 16px 16px; background: rgba(233, 237, 242, .95); -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); transition: box-shadow .2s ease; }
+.top.stuck { box-shadow: 0 1px 0 rgba(18, 24, 38, .06), 0 10px 24px -18px rgba(18, 24, 38, .35); }
+.title { min-width: 0; }
+#top-sentinel { height: 1px; margin-bottom: -1px; }
+.status-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 h1 { font-size: 2.1rem; font-weight: 800; letter-spacing: -.035em; line-height: 1.1; }
 
 .status { display: flex; align-items: center; gap: 9px; margin-top: 6px; color: var(--muted); font-size: .9rem; font-weight: 600; }
@@ -203,10 +207,14 @@ html[data-dir="fade"]::view-transition-old(root), html[data-dir="fade"]::view-tr
 
 @media (max-width: 560px) {
   .shell { width: calc(100% - 24px); padding-top: 24px; }
-  .top { flex-direction: column; align-items: stretch; gap: 16px; margin-bottom: 18px; }
-  h1 { font-size: 1.75rem; }
-  .status { font-size: .85rem; }
-  .seg { width: 100%; }
+  .top { gap: 12px; margin: 0 -12px 14px; padding: max(12px, env(safe-area-inset-top)) 12px 12px; }
+  h1 { font-size: 1.4rem; }
+  .status { gap: 7px; margin-top: 3px; font-size: .78rem; }
+  .status-note { display: none; }
+  .seg { width: 168px; padding: 4px; border-radius: 15px; }
+  .seg-pill { top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 11px; }
+  .seg button { height: 38px; gap: 5px; font-size: .85rem; }
+  .seg svg { width: 15px; height: 15px; }
   .grid { grid-auto-rows: minmax(112px, auto); gap: 10px; }
   .tile { padding: 15px; border-radius: 18px; }
   .dot { top: 15px; right: 15px; }

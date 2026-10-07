@@ -17,16 +17,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=7" />
+    <link rel="stylesheet" href="styles.css?v=9" />
   </head>
   <body data-mode="web">
     <main class="shell">
+      <div id="top-sentinel" aria-hidden="true"></div>
       <header class="top">
         <div class="title">
           <h1>App Drawer</h1>
           <p class="status" id="status" data-state="checking">
             <span class="status-dot" aria-hidden="true"></span>
-            <span id="status-text">Checking services</span>
+            <span class="status-text" id="status-text">Checking services</span>
           </p>
         </div>
 
@@ -56,6 +57,6 @@
       <button type="button" class="sr-only" data-close-folder>Close folder</button>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=9"></script>
   </body>
 </html>

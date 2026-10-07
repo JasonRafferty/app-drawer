@@ -230,11 +230,12 @@ function renderStatus() {
   const apps = checkedApps(mode);
   const states = apps.map((app) => status.get(`${mode}:${app.id}`) ?? 'checking');
   const up = states.filter((state) => state === 'up').length;
-  let state = 'ok'; let text = `All ${apps.length} online · ${MODES[mode].note}`;
+  const note = `<span class="status-note"> · ${MODES[mode].note}</span>`;
+  let state = 'ok'; let text = `All ${apps.length} online${note}`;
   if (states.includes('checking')) { state = 'checking'; text = `Checking ${apps.length} services…`; }
   else if (up === 0) { state = 'down'; text = MODES[mode].away; }
-  else if (up < apps.length) { state = 'partial'; text = `${up} of ${apps.length} online · ${MODES[mode].note}`; }
-  $('#status').dataset.state = state; $('#status-text').textContent = text;
+  else if (up < apps.length) { state = 'partial'; text = `${up} of ${apps.length} online${note}`; }
+  $('#status').dataset.state = state; $('#status-text').innerHTML = text;
 }
 
 // --- iPhone-style folders: zoom open from the tile, zoom back into it -------------------
@@ -300,6 +301,10 @@ document.addEventListener('click', (event) => {
 dialog.addEventListener('click', (event) => { if (event.target.closest('[data-close-folder]') || !event.target.closest('.folder-panel')) closeFolder(); });
 dialog.addEventListener('cancel', (event) => { event.preventDefault(); closeFolder(); });
 window.addEventListener('resize', balance);
+
+// --- pinned header: add a soft shadow once the page scrolls under it
+const header = $('.top');
+new IntersectionObserver(([entry]) => header.classList.toggle('stuck', !entry.isIntersecting)).observe($('#top-sentinel'));
 
 // --- press and hold a tile (touch or mouse) to pin it to the top ----------------------------------------------------------
 const toast = $('#toast');

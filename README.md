@@ -5,8 +5,11 @@ Local-only draft launcher for Jason's home-server services and project links.
 Run it from this folder with:
 
 ```bash
-python3 -m http.server 4174
+python3 serve.py
 ```
+
+This works like `python3 -m http.server 4174` but tells browsers, and the installed app, to always
+check for the latest files, so updates show up straight away.
 
 Then open http://localhost:4174.
 
