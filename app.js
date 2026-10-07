@@ -26,7 +26,7 @@ const FOLDERS = [
     { name: 'Blackjack Game', url: 'https://jasonrafferty.github.io/blackjack-game/', logo: 'blackjack.png' },
     { name: 'Traffic Notifier', url: 'https://jasonrafferty.github.io/traffic-notifier/', glyph: 'cone', theme: ['#60a5fa', '#1d4ed8'] },
     { name: 'Take-Home Calculator', url: 'https://jasonrafferty.github.io/take-home-calculator/', glyph: 'calculator', theme: ['#4ade80', '#15803d'] },
-    { name: 'Bridge House source', url: 'https://github.com/JasonRafferty/bridge-house-invite', logo: 'github.svg' },
+    { name: 'Bridge House site', url: 'https://bridgehouseinvite.siplyapp.co.uk/', image: 'bridge-house.svg' },
   ] },
 ];
 
