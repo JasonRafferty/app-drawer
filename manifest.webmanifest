@@ -1,0 +1,16 @@
+{
+  "name": "App Drawer",
+  "short_name": "Apps",
+  "description": "Jason's home-server apps and project links",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#e9edf2",
+  "theme_color": "#e9edf2",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/app-icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

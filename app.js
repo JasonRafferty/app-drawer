@@ -84,7 +84,6 @@ function iconHtml(item) {
   const [a, b, ink = '#fff'] = item.theme ?? ['#64748b', '#334155'];
   return `<span class="icon glyph" style="--ga:${a};--gb:${b};--ink:${ink}"><svg viewBox="0 0 24 24" aria-hidden="true">${GLYPHS[item.glyph] ?? ''}</svg></span>${badge}`;
 }
-function pinButton(item) { const pinned = pins.has(item.id); return `<button class="pin" type="button" data-toggle-pin="${item.id}" aria-pressed="${pinned}" title="${pinned ? 'Unpin' : 'Pin'} ${item.name}"><span aria-hidden="true">${pinned ? '★' : '☆'}</span><span class="sr-only">${pinned ? 'Unpin' : 'Pin'} ${item.name}</span></button>`; }
 const offlineTag = '<span class="offline-tag">Offline</span>';
 
 function tileHtml(app, featured) {
@@ -92,12 +91,12 @@ function tileHtml(app, featured) {
   const vars = [`view-transition-name:vt-${app.id}`];
   if (featured && app.theme) vars.push(`--a:${app.theme[0]}`, `--b:${app.theme[1]}`);
   const state = link.check === false ? 'unchecked' : status.get(`${mode}:${app.id}`) ?? 'checking';
-  return `<article class="tile drawer-item app${featured ? ' feature' : ''}" data-item="${app.id}" data-state="${state}" style="${vars.join(';')}"><a class="tile-link" href="${link.url}" target="_blank" rel="noreferrer"><span class="dot" data-state="${state}" title="Checking"></span><span class="ic">${iconHtml(app)}</span><span class="copy"><b>${app.name}</b><small>${desc}</small><span class="meta"><span class="host">${hostLabel(link.url, mode)}</span>${both ? '<span class="both">Home + Web</span>' : ''}</span></span>${offlineTag}</a>${pinButton(app)}</article>`;
+  return `<article class="tile drawer-item app${featured ? ' feature' : ''}" data-item="${app.id}" data-state="${state}" style="${vars.join(';')}"><a class="tile-link" href="${link.url}" target="_blank" rel="noreferrer" draggable="false"><span class="dot" data-state="${state}" title="Checking"></span><span class="ic">${iconHtml(app)}</span><span class="copy"><b>${app.name}</b><small>${desc}</small><span class="meta"><span class="host">${hostLabel(link.url, mode)}</span>${both ? '<span class="both">Home + Web</span>' : ''}</span></span>${offlineTag}</a></article>`;
 }
 
 function folderHtml(folder) {
   const minis = folder.children.slice(0, 9).map((child) => `<span class="mini">${iconHtml(child)}</span>`).join('');
-  return `<article class="tile drawer-item folder" data-item="${folder.id}" data-state="${folderState(folder)}" style="view-transition-name:vt-${folder.id}"><button class="folder-open" type="button" data-open-folder="${folder.id}" aria-haspopup="dialog"><span class="dot" data-state="${folderState(folder)}"></span><span class="folder-preview" aria-hidden="true">${minis}</span><span class="copy"><b>${folder.name}</b><small>${folder.desc}</small></span></button>${pinButton(folder)}</article>`;
+  return `<article class="tile drawer-item folder" data-item="${folder.id}" data-state="${folderState(folder)}" style="view-transition-name:vt-${folder.id}"><button class="folder-open" type="button" data-open-folder="${folder.id}" aria-haspopup="dialog"><span class="dot" data-state="${folderState(folder)}"></span><span class="folder-preview" aria-hidden="true">${minis}</span><span class="copy"><b>${folder.name}</b><small>${folder.desc}</small></span></button></article>`;
 }
 
 // --- render --------------------------------------------------------------------------
@@ -283,7 +282,6 @@ function closeFolder() {
 // --- events ------------------------------------------------------------------------------
 document.addEventListener('click', (event) => {
   const modeButton = event.target.closest('[data-set-mode]'); if (modeButton) { setMode(modeButton.dataset.setMode); return; }
-  const pin = event.target.closest('[data-toggle-pin]'); if (pin) { togglePin(pin.dataset.togglePin); return; }
   const folder = event.target.closest('[data-open-folder]'); if (folder) openFolder(folder.dataset.openFolder, folder);
 });
 // Like iOS: tap anywhere outside the panel to close. Esc closes too.
@@ -291,7 +289,7 @@ dialog.addEventListener('click', (event) => { if (event.target.closest('[data-cl
 dialog.addEventListener('cancel', (event) => { event.preventDefault(); closeFolder(); });
 window.addEventListener('resize', balance);
 
-// --- touch: press-and-hold to pin ----------------------------------------------------------
+// --- press and hold a tile (touch or mouse) to pin it to the top ----------------------------------------------------------
 const toast = $('#toast');
 let toastTimer;
 function showToast(text) {
@@ -304,10 +302,12 @@ function showToast(text) {
 const HOLD_MS = 500;
 let hold = null;
 let held = false;
+let holdPointer = 'mouse';
 grid.addEventListener('pointerdown', (event) => {
   const item = event.target.closest('.drawer-item');
-  if (!item || event.pointerType === 'mouse' || event.target.closest('.pin')) return;
+  if (!item || event.button > 0) return;
   held = false;
+  holdPointer = event.pointerType;
   hold = { x: event.clientX, y: event.clientY, timer: setTimeout(() => {
     held = true;
     navigator.vibrate?.(12);
@@ -322,7 +322,7 @@ grid.addEventListener('pointercancel', cancelHold);
 grid.addEventListener('pointermove', (event) => { if (hold && Math.hypot(event.clientX - hold.x, event.clientY - hold.y) > 10) cancelHold(); });
 // A long press shouldn't also open the app or folder.
 grid.addEventListener('click', (event) => { if (held) { event.preventDefault(); event.stopPropagation(); held = false; } }, true);
-grid.addEventListener('contextmenu', (event) => { if (event.target.closest('.drawer-item')) event.preventDefault(); });
+grid.addEventListener('contextmenu', (event) => { if (holdPointer !== 'mouse' && event.target.closest('.drawer-item')) event.preventDefault(); });
 // iOS Safari only shows :active press styles when the page listens for touches.
 document.addEventListener('touchstart', () => {}, { passive: true });
 

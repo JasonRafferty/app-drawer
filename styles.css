@@ -43,7 +43,7 @@ body[data-mode="web"] .seg-pill { transform: translateX(100%); }
 .seg button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 /* bento grid ------------------------------------------------------------------ */
-.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 150px; grid-auto-flow: dense; gap: 14px; }
+.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(150px, auto); grid-auto-flow: dense; gap: 14px; }
 .tile { position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 18px; border-radius: var(--radius); background: var(--tile); box-shadow: 0 1px 2px rgba(18, 24, 38, .05); }
 .tile-link, .folder-open { display: flex; flex: 1; flex-direction: column; justify-content: space-between; min-width: 0; border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-align: left; text-decoration: none; cursor: pointer; }
 
@@ -55,7 +55,7 @@ body[data-mode="web"] .seg-pill { transform: translateX(100%); }
   .drawer-item:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -18px rgba(18, 24, 38, .35); }
   .drawer-item:active { transform: translateY(-1px) scale(.98); }
 }
-.tile-link:focus-visible, .folder-open:focus-visible, .pin:focus-visible, .folder-app:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.tile-link:focus-visible, .folder-open:focus-visible, .folder-app:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .ic { position: relative; flex: none; width: 40px; height: 40px; }
 
 /* icons: logo on a plain tile, full-bleed image, or a line symbol on a gradient */
@@ -110,14 +110,6 @@ body[data-mode="web"] .seg-pill { transform: translateX(100%); }
 .feature .dot { top: 24px; right: 24px; }
 .feature .dot[data-state="up"] { box-shadow: 0 0 0 4px rgba(255, 255, 255, .25); }
 
-/* Pins persist in the browser and work with a mouse, keyboard or touch. */
-.pin { position: absolute; right: 12px; bottom: 12px; z-index: 2; display: grid; place-items: center; width: 31px; height: 31px; border: 0; border-radius: 10px; background: transparent; color: #8993a5; font: 1.2rem/1 system-ui, sans-serif; cursor: pointer; opacity: 0; transition: opacity .16s ease, color .16s ease, background .16s ease; }
-.pin:hover, .pin:focus-visible, .pin[aria-pressed="true"] { background: #edf0f5; color: #e3a008; opacity: 1; }
-.drawer-item:hover .pin, .drawer-item:focus-within .pin { opacity: 1; }
-/* touch screens pin with a long press instead of the star */
-@media (hover: none) { .pin { display: none; } }
-.feature .pin { color: rgba(255,255,255,.75); }
-.feature .pin:hover, .feature .pin:focus-visible, .feature .pin[aria-pressed="true"] { background: rgba(255,255,255,.16); color: #ffe07a; }
 
 /* iPhone-style folders ------------------------------------------------------------ */
 .folder-preview { display: grid; grid-template-columns: repeat(3, 14px); grid-template-rows: repeat(3, 14px); gap: 4px; align-self: flex-start; padding: 8px; border-radius: 17px; background: rgba(18, 24, 38, .08); transition: opacity .2s ease; }
@@ -202,7 +194,7 @@ html[data-dir="left"]::view-transition-new(*):only-child { animation: in-from-ri
 
 /* tablet and phone ------------------------------------------------------------- */
 @media (max-width: 860px) {
-  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 136px; gap: 12px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(136px, auto); gap: 12px; }
 }
 
 @media (max-width: 560px) {
@@ -211,7 +203,7 @@ html[data-dir="left"]::view-transition-new(*):only-child { animation: in-from-ri
   h1 { font-size: 1.75rem; }
   .status { font-size: .85rem; }
   .seg { width: 100%; }
-  .grid { grid-auto-rows: 112px; gap: 10px; }
+  .grid { grid-auto-rows: minmax(112px, auto); gap: 10px; }
   .tile { padding: 15px; border-radius: 18px; }
   .dot { top: 15px; right: 15px; }
   .feature { grid-row: span 1; padding: 18px; }
@@ -223,6 +215,8 @@ html[data-dir="left"]::view-transition-new(*):only-child { animation: in-from-ri
   .app:not(.feature) .copy small, .folder .copy small, .app:not(.feature) .meta { display: none; }
   .copy b { display: -webkit-box; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: .95rem; line-height: 1.2; }
   .feature .copy b { -webkit-line-clamp: 1; }
+  .feature .copy { min-width: 0; }
+  .feature .copy small { overflow: hidden; text-overflow: ellipsis; }
   [data-state="down"] > .tile-link .offline-tag { top: 12px; right: 12px; }
   /* no frosted blur on the panel itself: cheaper for phones to animate */
   .folder-panel { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(246, 247, 250, .96); }
