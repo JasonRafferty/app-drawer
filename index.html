@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#e9edf2" />
+    <title>Jason's App Drawer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-mode="web">
+    <main class="shell">
+      <header class="top">
+        <div class="title">
+          <h1>App Drawer</h1>
+          <p class="status" id="status" data-state="checking">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="status-text">Checking services</span>
+          </p>
+        </div>
+
+        <div class="seg" role="radiogroup" aria-label="Which links to show">
+          <span class="seg-pill" aria-hidden="true"></span>
+          <button type="button" role="radio" data-set-mode="home" aria-checked="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" /></svg>
+            Home
+          </button>
+          <button type="button" role="radio" data-set-mode="web" aria-checked="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z" /></svg>
+            Web
+          </button>
+        </div>
+      </header>
+
+      <!-- app tiles are rendered here by app.js -->
+      <section class="grid" id="grid" aria-live="polite"></section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
