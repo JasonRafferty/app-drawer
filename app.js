@@ -40,7 +40,6 @@ const GLYPHS = {
   shield: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6Z"/><path d="m9 12 2.2 2.2L15.5 10"/>',
 };
 
-const FEATURED = { home: 'jellyfin', web: 'audiobookshelf' };
 const MODES = {
   home: { note: 'opens on your home Wi-Fi', away: 'Not reachable. Are you on your home Wi-Fi?' },
   web: { note: 'works from anywhere', away: 'Nothing reachable. Check your connection.' },
@@ -54,13 +53,25 @@ const grid = $('#grid');
 const dialog = $('#folder-dialog');
 const status = new Map(); // `${mode}:${id}` for apps, `${mode}:${folderId}:${index}` for folder links
 let mode = readMode();
-let pins = readPins();
+let layout = readLayout();
+let editing = false;
 let openFolderId = null;
 document.body.classList.add('preload');
 
 function readMode() { try { return localStorage.getItem('app-drawer-mode') === 'home' ? 'home' : 'web'; } catch { return 'web'; } }
-function readPins() { try { const saved = JSON.parse(localStorage.getItem('app-drawer-pins') || '[]'); return new Set(Array.isArray(saved) ? saved : []); } catch { return new Set(); } }
-function savePins() { try { localStorage.setItem('app-drawer-pins', JSON.stringify([...pins])); } catch {} }
+function readLayout() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('app-drawer-layout') || '{}');
+    return Object.fromEntries(['home', 'web'].map((key) => [key, {
+      order: Array.isArray(saved?.[key]?.order) ? saved[key].order.filter((id) => typeof id === 'string') : [],
+      hidden: Array.isArray(saved?.[key]?.hidden) ? saved[key].hidden.filter((id) => typeof id === 'string') : [],
+    }]));
+  } catch { return { home: { order: [], hidden: [] }, web: { order: [], hidden: [] } }; }
+}
+function saveLayout() {
+  try { localStorage.setItem('app-drawer-layout', JSON.stringify(layout)); }
+  catch { showToast('Changes could not be saved in this browser'); }
+}
 function appsFor(activeMode) { return APPS.filter((app) => app[activeMode]); }
 // Links marked `check: false` can't be checked from the browser (self-signed certificate, or the site blocks it).
 function checkedApps(activeMode) { return appsFor(activeMode).filter((app) => app[activeMode].check !== false); }
@@ -68,12 +79,10 @@ function foldersFor(activeMode) { return FOLDERS.filter((folder) => folder.mode 
 function itemsFor(activeMode) { return [...appsFor(activeMode), ...foldersFor(activeMode)]; }
 
 function ordered(items) {
-  const pinOrder = [...pins];
-  return [...items].sort((a, b) => {
-    const aPin = pins.has(a.id); const bPin = pins.has(b.id);
-    if (aPin !== bPin) return aPin ? -1 : 1;
-    return pinOrder.indexOf(a.id) - pinOrder.indexOf(b.id);
-  });
+  const { order, hidden } = layout[mode];
+  const visible = items.filter((item) => !hidden.includes(item.id));
+  return [...order.map((id) => visible.find((item) => item.id === id)).filter(Boolean),
+    ...visible.filter((item) => !order.includes(item.id))];
 }
 
 // --- markup ------------------------------------------------------------------------
@@ -103,9 +112,15 @@ function folderHtml(folder) {
 // --- render --------------------------------------------------------------------------
 function render() {
   const list = ordered(itemsFor(mode));
-  const featured = list.find((item) => !item.children && pins.has(item.id)) || list.find((item) => item.id === FEATURED[mode]);
-  const items = featured ? [featured, ...list.filter((item) => item !== featured)] : list;
-  grid.innerHTML = items.map((item) => item.children ? folderHtml(item) : tileHtml(item, item === featured)).join('');
+  grid.innerHTML = list.map((item) => item.children ? folderHtml(item) : tileHtml(item, false)).join('');
+  grid.querySelectorAll('.drawer-item').forEach((tile) => {
+    const name = list.find((item) => item.id === tile.dataset.item).name;
+    const remove = document.createElement('button');
+    remove.type = 'button'; remove.className = 'remove-tile'; remove.textContent = '−';
+    remove.setAttribute('aria-label', `Remove ${name}`);
+    tile.append(remove);
+  });
+  document.body.classList.toggle('editing', editing);
   document.body.dataset.mode = mode;
   document.querySelectorAll('[data-set-mode]').forEach((button) => button.setAttribute('aria-checked', String(button.dataset.setMode === mode)));
   balance(); renderStatus(); checkAll();
@@ -132,14 +147,13 @@ function transition(update, direction = 'none') {
 
 function setMode(next) {
   if (next === mode) return;
+  finishEditing();
   // Pages: Web sits to the right of Home, so going to Web slides the tiles off to the left (like a swipe).
   const direction = next === 'web' ? 'left' : 'right';
   mode = next;
   try { localStorage.setItem('app-drawer-mode', mode); } catch {}
   transition(render, direction);
 }
-
-function togglePin(id) { if (pins.has(id)) pins.delete(id); else pins.add(id); savePins(); transition(render); }
 
 // Stretch tiles so the grid never ends with a gap, beside the big tile or on the last row.
 function balance() {
@@ -310,7 +324,7 @@ function resetGridDrag(animate) {
 document.addEventListener('touchstart', (event) => {
   const touch = event.touches[0];
   // Ignore multi-touch, open folders and the screen edges (the browser's own back/forward swipe).
-  if (event.touches.length !== 1 || dialog.open || touch.clientX < 24 || touch.clientX > window.innerWidth - 24) { swipe = null; return; }
+  if (editing || event.touches.length !== 1 || dialog.open || touch.clientX < 24 || touch.clientX > window.innerWidth - 24) { swipe = null; return; }
   swipe = { x: touch.clientX, y: touch.clientY, dx: 0, axis: null };
 }, { passive: true });
 
@@ -400,7 +414,7 @@ window.addEventListener('resize', balance);
 const header = $('.top');
 new IntersectionObserver(([entry]) => header.classList.toggle('stuck', !entry.isIntersecting)).observe($('#top-sentinel'));
 
-// --- press and hold a tile (touch or mouse) to pin it to the top ----------------------------------------------------------
+// --- hold to edit, reorder and remove tiles -------------------------------------------
 const toast = $('#toast');
 let toastTimer;
 function showToast(text) {
@@ -412,28 +426,110 @@ function showToast(text) {
 
 const HOLD_MS = 500;
 let hold = null;
+let drag = null;
 let held = false;
-let holdPointer = 'mouse';
+const editBar = document.createElement('div');
+editBar.className = 'edit-bar';
+editBar.innerHTML = '<span>Drag tiles to move them</span><button type="button" data-restore>Restore removed</button><button type="button" data-done>Done</button>';
+grid.before(editBar);
+function beginEditing() {
+  editing = true;
+  document.body.classList.add('editing');
+  swipe = null; resetGridDrag(false);
+}
+function finishEditing() {
+  cancelHold();
+  endDrag();
+  editing = false;
+  document.body.classList.remove('editing');
+}
+function cancelHold() { if (hold) clearTimeout(hold.timer); hold = null; }
+function startDrag(item, event) {
+  drag = { item, pointerId: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+  grid.setPointerCapture(event.pointerId);
+  item.classList.add('is-dragging');
+}
+function endDrag() {
+  if (!drag) return;
+  drag.item.classList.remove('is-dragging');
+  if (grid.hasPointerCapture(drag.pointerId)) grid.releasePointerCapture(drag.pointerId);
+  drag = null;
+  balance();
+}
 grid.addEventListener('pointerdown', (event) => {
   const item = event.target.closest('.drawer-item');
-  if (!item || event.button > 0) return;
+  if (!item || event.button > 0 || event.target.closest('.remove-tile')) return;
   held = false;
-  holdPointer = event.pointerType;
-  hold = { x: event.clientX, y: event.clientY, timer: setTimeout(() => {
+  if (editing) { event.preventDefault(); startDrag(item, event); return; }
+  hold = { x: event.clientX, y: event.clientY, lastY: event.clientY, scrolling: false, timer: setTimeout(() => {
     held = true;
     navigator.vibrate?.(12);
-    const id = item.dataset.item;
-    togglePin(id);
-    showToast(pins.has(id) ? 'Pinned to the top' : 'Unpinned');
+    beginEditing(); startDrag(item, event);
   }, HOLD_MS) };
 });
-const cancelHold = () => { if (hold) clearTimeout(hold.timer); hold = null; };
-grid.addEventListener('pointerup', cancelHold);
-grid.addEventListener('pointercancel', cancelHold);
-grid.addEventListener('pointermove', (event) => { if (hold && Math.hypot(event.clientX - hold.x, event.clientY - hold.y) > 10) cancelHold(); });
-// A long press shouldn't also open the app or folder.
-grid.addEventListener('click', (event) => { if (held) { event.preventDefault(); event.stopPropagation(); held = false; } }, true);
-grid.addEventListener('contextmenu', (event) => { if (holdPointer !== 'mouse' && event.target.closest('.drawer-item')) event.preventDefault(); });
+grid.addEventListener('pointermove', (event) => {
+  if (drag) {
+    event.preventDefault();
+    if (Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < 10 && !drag.moved) return;
+    drag.moved = true; held = true;
+    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('.drawer-item');
+    if (target && target !== drag.item && grid.contains(target)) {
+      const tiles = [...grid.children];
+      const forward = tiles.indexOf(target) > tiles.indexOf(drag.item);
+      grid.insertBefore(drag.item, forward ? target.nextSibling : target);
+      layout[mode].order = [...grid.children].map((tile) => tile.dataset.item);
+      saveLayout(); balance();
+    }
+    if (event.clientY < 80) window.scrollBy(0, -12);
+    else if (event.clientY > innerHeight - 80) window.scrollBy(0, 12);
+    return;
+  }
+  if (hold && Math.hypot(event.clientX - hold.x, event.clientY - hold.y) > 10) {
+    clearTimeout(hold.timer);
+    hold.scrolling = true;
+    held = true;
+  }
+  if (hold?.scrolling && event.pointerType === 'touch') {
+    window.scrollBy(0, hold.lastY - event.clientY);
+    hold.lastY = event.clientY;
+  }
+});
+window.addEventListener('pointerup', () => { cancelHold(); endDrag(); });
+window.addEventListener('pointercancel', () => { cancelHold(); endDrag(); });
+grid.addEventListener('lostpointercapture', endDrag);
+grid.addEventListener('click', (event) => {
+  const remove = event.target.closest('.remove-tile');
+  if (remove && editing) {
+    event.preventDefault(); event.stopPropagation();
+    layout[mode].hidden.push(remove.closest('.drawer-item').dataset.item);
+    saveLayout(); render(); return;
+  }
+  if (editing || held) { event.preventDefault(); event.stopPropagation(); held = false; }
+}, true);
+grid.addEventListener('contextmenu', (event) => {
+  if (!event.target.closest('.drawer-item')) return;
+  event.preventDefault(); cancelHold(); beginEditing();
+});
+grid.addEventListener('keydown', (event) => {
+  const tile = event.target.closest('.drawer-item');
+  if (!tile) return;
+  if (event.key === 'F2') { event.preventDefault(); beginEditing(); }
+  if (editing && event.altKey && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+    event.preventDefault();
+    const previous = event.key === 'ArrowLeft' || event.key === 'ArrowUp';
+    const target = previous ? tile.previousElementSibling : tile.nextElementSibling;
+    if (target) {
+      grid.insertBefore(tile, previous ? target : target.nextSibling);
+      layout[mode].order = [...grid.children].map((item) => item.dataset.item);
+      saveLayout(); balance(); event.target.focus();
+    }
+  }
+});
+document.addEventListener('keydown', (event) => { if (event.key === 'Escape') finishEditing(); });
+editBar.addEventListener('click', (event) => {
+  if (event.target.closest('[data-done]')) finishEditing();
+  if (event.target.closest('[data-restore]')) { layout[mode].hidden = []; saveLayout(); render(); }
+});
 // iOS Safari only shows :active press styles when the page listens for touches.
 document.addEventListener('touchstart', () => {}, { passive: true });
 
