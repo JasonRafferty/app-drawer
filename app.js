@@ -110,14 +110,15 @@ function render() {
     const item = items.find((item) => item.id === tile.dataset.item);
     const pinned = pins.has(item.id);
     tile.classList.toggle('is-pinned', pinned);
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'pin-button';
-    button.dataset.pin = item.id;
-    button.setAttribute('aria-pressed', String(pinned));
-    button.setAttribute('aria-label', `${pinned ? 'Unpin' : 'Pin'} ${item.name}`);
-    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 3 8 0-1 6 3 3v2h-5v7l-1-2-1 2v-7H6v-2l3-3z"/></svg><span>' + (pinned ? 'Pinned' : 'Pin') + '</span>';
-    tile.append(button);
+    if (pinned) {
+      const marker = document.createElement('span');
+      marker.className = 'pin-marker';
+      marker.setAttribute('role', 'img');
+      marker.setAttribute('aria-label', 'Pinned');
+      marker.title = 'Pinned — hold to unpin';
+      marker.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 6 3 3v2h-5v7l-1-2-1 2v-7H6v-2l3-3z"/></svg>';
+      tile.append(marker);
+    }
   });
   document.body.dataset.mode = mode;
   document.querySelectorAll('[data-set-mode]').forEach((button) => button.setAttribute('aria-checked', String(button.dataset.setMode === mode)));
@@ -164,7 +165,7 @@ function togglePin(id) {
       { transform: 'scale(1.035)', boxShadow: '0 0 0 7px #60a5fa88', offset: .45 },
       { transform: 'scale(1)', boxShadow: '0 0 0 14px #60a5fa00' },
     ], { duration: 520, easing: 'ease-out' });
-    tile.querySelector('.pin-button').animate([
+    tile.querySelector('.pin-marker')?.animate([
       { transform: 'scale(.8) rotate(-12deg)' },
       { transform: 'scale(1.2) rotate(8deg)' },
       { transform: 'scale(1) rotate(0)' },
@@ -446,7 +447,7 @@ let hold = null;
 let held = false;
 grid.addEventListener('pointerdown', (event) => {
   const item = event.target.closest('.drawer-item');
-  if (!item || event.button > 0 || event.target.closest('[data-pin]')) return;
+  if (!item || event.button > 0) return;
   cancelHold();
   held = false;
   hold = { x: event.clientX, y: event.clientY, timer: setTimeout(() => {
@@ -465,15 +466,6 @@ grid.addEventListener('pointercancel', cancelHold);
 grid.addEventListener('pointermove', (event) => { if (hold && Math.hypot(event.clientX - hold.x, event.clientY - hold.y) > 10) cancelHold(); });
 // A long press shouldn't also open the app or folder.
 grid.addEventListener('click', (event) => {
-  const button = event.target.closest('[data-pin]');
-  if (button) {
-    event.preventDefault(); event.stopPropagation();
-    const id = button.dataset.pin;
-    const name = itemsFor(mode).find((item) => item.id === id)?.name || 'Tile';
-    togglePin(id);
-    showToast(pins.has(id) ? `${name} pinned to the top` : `${name} unpinned`);
-    held = false; return;
-  }
   if (held) { event.preventDefault(); event.stopPropagation(); held = false; } }, true);
 grid.addEventListener('contextmenu', (event) => { if (event.target.closest('.drawer-item')) event.preventDefault(); });
 // Cancel the native touch gesture at its start: contextmenu alone is too late
