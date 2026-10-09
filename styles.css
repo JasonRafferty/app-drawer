@@ -250,3 +250,6 @@ html[data-dir="fade"]::view-transition-old(root), html[data-dir="fade"]::view-tr
 .is-pinned { box-shadow: inset 0 0 0 2px #7da8e8; }
 .drawer-item img { -webkit-user-drag: none; }
 [data-state="down"] > .tile-link .offline-tag { top: 44px; }
+
+.drawer-item, .drawer-item * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.is-pinned .pin-button { background: #1d4ed8; color: #fff; }

@@ -152,7 +152,25 @@ function setMode(next) {
   transition(render, direction);
 }
 
-function togglePin(id) { if (pins.has(id)) pins.delete(id); else pins.add(id); savePins(); transition(render); }
+function togglePin(id) {
+  if (pins.has(id)) pins.delete(id); else pins.add(id);
+  savePins();
+  // Render immediately so the feedback belongs to the tile that was pressed.
+  render();
+  const tile = grid.querySelector(`[data-item="${id}"]`);
+  if (tile && !REDUCED_MOTION.matches) {
+    tile.animate([
+      { transform: 'scale(.96)', boxShadow: '0 0 0 0 #60a5fa00' },
+      { transform: 'scale(1.035)', boxShadow: '0 0 0 7px #60a5fa88', offset: .45 },
+      { transform: 'scale(1)', boxShadow: '0 0 0 14px #60a5fa00' },
+    ], { duration: 520, easing: 'ease-out' });
+    tile.querySelector('.pin-button').animate([
+      { transform: 'scale(.8) rotate(-12deg)' },
+      { transform: 'scale(1.2) rotate(8deg)' },
+      { transform: 'scale(1) rotate(0)' },
+    ], { duration: 450, easing: 'ease-out' });
+  }
+}
 
 // Stretch tiles so the grid never ends with a gap, beside the big tile or on the last row.
 function balance() {
@@ -458,8 +476,39 @@ grid.addEventListener('click', (event) => {
   }
   if (held) { event.preventDefault(); event.stopPropagation(); held = false; } }, true);
 grid.addEventListener('contextmenu', (event) => { if (event.target.closest('.drawer-item')) event.preventDefault(); });
-// iOS Safari only shows :active press styles when the page listens for touches.
-document.addEventListener('touchstart', () => {}, { passive: true });
+// Cancel the native touch gesture at its start: contextmenu alone is too late
+// for Chrome's touch-to-search panel. Handle taps and scrolling ourselves on tiles.
+let tileTouch = null;
+grid.addEventListener('touchstart', (event) => {
+  if (event.touches.length !== 1) { cancelHold(); tileTouch = null; return; }
+  const target = event.target.closest('a, button');
+  if (!target) return;
+  event.preventDefault();
+  const touch = event.touches[0];
+  tileTouch = { target, x: touch.clientX, y: touch.clientY, lastY: touch.clientY, moved: false };
+}, { passive: false });
+grid.addEventListener('touchmove', (event) => {
+  if (!tileTouch || event.touches.length !== 1) return;
+  event.preventDefault();
+  const touch = event.touches[0];
+  const dx = touch.clientX - tileTouch.x;
+  const dy = touch.clientY - tileTouch.y;
+  if (Math.hypot(dx, dy) > 10) { tileTouch.moved = true; cancelHold(); }
+  if (tileTouch.moved && Math.abs(dy) >= Math.abs(dx) / 1.3) {
+    window.scrollBy(0, tileTouch.lastY - touch.clientY);
+  }
+  tileTouch.lastY = touch.clientY;
+}, { passive: false });
+grid.addEventListener('touchend', (event) => {
+  if (!tileTouch) return;
+  event.preventDefault();
+  const { target, moved } = tileTouch;
+  tileTouch = null;
+  cancelHold();
+  if (!moved && !held && target.isConnected) target.click();
+  held = false;
+}, { passive: false });
+grid.addEventListener('touchcancel', () => { tileTouch = null; cancelHold(); held = false; });
 
 render();
 const fontsReady = document.fonts?.ready ?? Promise.resolve();
