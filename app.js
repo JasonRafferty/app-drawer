@@ -1,5 +1,6 @@
 // Icons: `logo` sits on a white tile, `image` fills the tile, `glyph` draws a symbol on a `theme` gradient.
 const APPS = [
+  { id: 'tally', name: 'Tally', desc: 'Shared shopping lists and to-dos', image: 'tally.svg', web: { url: 'https://tally.jrapp.co.uk' } },
   { id: 'audiobookshelf', name: 'Audiobookshelf', logo: 'audiobookshelf.svg', theme: ['#f59e0b', '#c2410c'], home: { url: 'http://192.168.0.35:13378', desc: 'Use this for uploads over 100 MB' }, web: { url: 'https://audiobooks.jrapp.co.uk', desc: 'Listen from anywhere' } },
   { id: 'jellyfin', name: 'Jellyfin', desc: 'Films and TV library', logo: 'jellyfin.svg', theme: ['#7b4dff', '#2fa6ff'], home: { url: 'http://192.168.0.35:8096' } },
   { id: 'pihole', name: 'Pi-hole', desc: 'DNS and network controls', logo: 'pi-hole.svg', home: { url: 'http://192.168.0.35/admin' } },
