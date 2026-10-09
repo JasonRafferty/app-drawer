@@ -106,6 +106,19 @@ function render() {
   const featured = list.find((item) => !item.children && pins.has(item.id)) || list.find((item) => item.id === FEATURED[mode]);
   const items = featured ? [featured, ...list.filter((item) => item !== featured)] : list;
   grid.innerHTML = items.map((item) => item.children ? folderHtml(item) : tileHtml(item, item === featured)).join('');
+  grid.querySelectorAll('.drawer-item').forEach((tile) => {
+    const item = items.find((item) => item.id === tile.dataset.item);
+    const pinned = pins.has(item.id);
+    tile.classList.toggle('is-pinned', pinned);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'pin-button';
+    button.dataset.pin = item.id;
+    button.setAttribute('aria-pressed', String(pinned));
+    button.setAttribute('aria-label', `${pinned ? 'Unpin' : 'Pin'} ${item.name}`);
+    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 3 8 0-1 6 3 3v2h-5v7l-1-2-1 2v-7H6v-2l3-3z"/></svg><span>' + (pinned ? 'Pinned' : 'Pin') + '</span>';
+    tile.append(button);
+  });
   document.body.dataset.mode = mode;
   document.querySelectorAll('[data-set-mode]').forEach((button) => button.setAttribute('aria-checked', String(button.dataset.setMode === mode)));
   balance(); renderStatus(); checkAll();
@@ -413,27 +426,38 @@ function showToast(text) {
 const HOLD_MS = 500;
 let hold = null;
 let held = false;
-let holdPointer = 'mouse';
 grid.addEventListener('pointerdown', (event) => {
   const item = event.target.closest('.drawer-item');
-  if (!item || event.button > 0) return;
+  if (!item || event.button > 0 || event.target.closest('[data-pin]')) return;
+  cancelHold();
   held = false;
-  holdPointer = event.pointerType;
   hold = { x: event.clientX, y: event.clientY, timer: setTimeout(() => {
     held = true;
     navigator.vibrate?.(12);
     const id = item.dataset.item;
     togglePin(id);
-    showToast(pins.has(id) ? 'Pinned to the top' : 'Unpinned');
+    const name = itemsFor(mode).find((item) => item.id === id)?.name || 'Tile';
+    showToast(pins.has(id) ? `${name} pinned to the top` : `${name} unpinned`);
   }, HOLD_MS) };
 });
 const cancelHold = () => { if (hold) clearTimeout(hold.timer); hold = null; };
-grid.addEventListener('pointerup', cancelHold);
+window.addEventListener('pointerup', cancelHold);
+grid.addEventListener('dragstart', (event) => event.preventDefault());
 grid.addEventListener('pointercancel', cancelHold);
 grid.addEventListener('pointermove', (event) => { if (hold && Math.hypot(event.clientX - hold.x, event.clientY - hold.y) > 10) cancelHold(); });
 // A long press shouldn't also open the app or folder.
-grid.addEventListener('click', (event) => { if (held) { event.preventDefault(); event.stopPropagation(); held = false; } }, true);
-grid.addEventListener('contextmenu', (event) => { if (holdPointer !== 'mouse' && event.target.closest('.drawer-item')) event.preventDefault(); });
+grid.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-pin]');
+  if (button) {
+    event.preventDefault(); event.stopPropagation();
+    const id = button.dataset.pin;
+    const name = itemsFor(mode).find((item) => item.id === id)?.name || 'Tile';
+    togglePin(id);
+    showToast(pins.has(id) ? `${name} pinned to the top` : `${name} unpinned`);
+    held = false; return;
+  }
+  if (held) { event.preventDefault(); event.stopPropagation(); held = false; } }, true);
+grid.addEventListener('contextmenu', (event) => { if (event.target.closest('.drawer-item')) event.preventDefault(); });
 // iOS Safari only shows :active press styles when the page listens for touches.
 document.addEventListener('touchstart', () => {}, { passive: true });
 
