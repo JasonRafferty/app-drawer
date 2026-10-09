@@ -27,12 +27,4 @@ hostname to `http://app-drawer:80`.
 
 Apps live in the `APPS` list at the top of `app.js`. Give each one a `home` address (on your
 Wi-Fi), a `web` address (works anywhere), or both. The Home / Web switch shows the matching set,
-and apps with both appear in either view.
-
-## Arranging tiles
-
-Hold a tile for half a second to edit, then drag it to a new position or tap its minus
-button to remove it. Tap Done to open links normally again. Restore removed brings
-back hidden tiles. Home and Web layouts are saved separately in this browser's local
-storage; clearing site data resets them. Keyboard: F2 enters edit mode, Alt + arrow
-keys move a focused tile, and Escape finishes editing.
+and apps with both appear in either view. `FEATURED` picks the big tile for each view.

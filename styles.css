@@ -241,18 +241,3 @@ html[data-dir="fade"]::view-transition-old(root), html[data-dir="fade"]::view-tr
   .app-icon .icon { border-radius: 16px; }
   .app-icon .icon.logo { padding: 12px; }
 }
-
-/* Tile arrangement */
-.grid { grid-auto-flow: row; }
-.drawer-item { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.drawer-item img { pointer-events: none; }
-.remove-tile { display: none; position: absolute; top: -7px; right: -7px; width: 32px; height: 32px; border: 2px solid white; border-radius: 50%; background: #b42318; color: white; font-size: 24px; line-height: 1; cursor: pointer; z-index: 2; }
-.editing .remove-tile { display: block; }
-.editing .drawer-item { cursor: grab; outline: 2px dashed #9aa7b8; outline-offset: 2px; }
-.editing .tile-link, .editing .folder-open { cursor: grab; }
-.is-dragging { opacity: .55; outline: 3px solid #334155 !important; }
-.edit-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: min(90vw, 540px); padding: 12px; border-radius: 18px; background: #e9edf2; box-shadow: 0 4px 24px #18223033; z-index: 20; display: none; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; font-size: .85rem; }
-.editing .edit-bar { display: flex; }
-.edit-bar span { flex: 1; }
-.edit-bar button { padding: 9px 13px; border: 0; border-radius: 12px; background: white; color: #182230; font: inherit; cursor: pointer; }
-.edit-bar [data-done] { background: #182230; color: white; }
