@@ -2,11 +2,10 @@
 const APPS = [
   { id: 'tally', name: 'Tally', desc: 'Shared shopping lists and to-dos', image: 'tally.svg', web: { url: 'https://tally.jrapp.co.uk' } },
   { id: 'simmer', name: 'Simmer', desc: 'Shared recipes and weekly meal plans', image: 'simmer.svg', web: { url: 'https://simmer.jrapp.co.uk' } },
-  { id: 'audiobookshelf', name: 'Audiobookshelf', logo: 'audiobookshelf.svg', theme: ['#f59e0b', '#c2410c'], home: { url: 'http://192.168.0.35:13378', desc: 'Use this for uploads over 100 MB' }, web: { url: 'https://audiobooks.jrapp.co.uk', desc: 'Listen from anywhere' } },
-  { id: 'jellyfin', name: 'Jellyfin', desc: 'Films and TV library', logo: 'jellyfin.svg', theme: ['#7b4dff', '#2fa6ff'], home: { url: 'http://192.168.0.35:8096' } },
+  { id: 'audiobookshelf', name: 'Audiobookshelf', logo: 'audiobookshelf.svg', theme: ['#f59e0b', '#c2410c'], home: { url: 'http://192.168.0.35:13378', desc: 'Use this for uploads over 100 MB' } },
+  { id: 'jellyfin', name: 'Jellyfin', desc: 'Films and TV library', logo: 'jellyfin.svg', theme: ['#7b4dff', '#2fa6ff'], home: { url: 'http://192.168.0.35:8096' }, web: { url: 'https://jellyfin.jrapp.co.uk', desc: 'Watch from anywhere' } },
   { id: 'pihole', name: 'Pi-hole', desc: 'DNS and network controls', logo: 'pi-hole.svg', home: { url: 'http://192.168.0.35/admin' } },
   { id: 'beszel', name: 'Beszel', desc: 'Server health and metrics', logo: 'beszel.svg', home: { url: 'http://192.168.0.35:8090' } },
-  { id: 'bridge-invite', name: 'Bridge House Invite', desc: 'RSVP and food voting', image: 'bridge-house.svg', web: { url: 'https://bridgehouseinvite.siplyapp.co.uk' } },
   { id: 'portainer', name: 'Portainer', desc: 'Manage Docker containers', logo: 'portainer.svg', home: { url: 'https://192.168.0.35:9443', check: false }, web: { url: 'https://portainer.jrapp.co.uk' } },
   { id: 'cloudflare', name: 'Cloudflare', desc: 'Manage your Cloudflare account', logo: 'cloudflare.svg', home: { url: 'https://dash.cloudflare.com/579bd1d79bb2eab5ff06e1479b504af9/home', check: false }, web: { url: 'https://dash.cloudflare.com/579bd1d79bb2eab5ff06e1479b504af9/home', check: false } },
   { id: 'tutoring', name: 'Tutoring website', desc: 'Jason Rafferty Tutoring', glyph: 'cap', theme: ['#818cf8', '#6d28d9'], web: { url: 'https://jasonrafferty.github.io' } },
@@ -28,7 +27,8 @@ const FOLDERS = [
     { name: 'Blackjack Game', url: 'https://jasonrafferty.github.io/blackjack-game/', logo: 'blackjack.png' },
     { name: 'Traffic Notifier', url: 'https://jasonrafferty.github.io/traffic-notifier/', glyph: 'cone', theme: ['#60a5fa', '#1d4ed8'] },
     { name: 'Take-Home Calculator', url: 'https://jasonrafferty.github.io/take-home-calculator/', glyph: 'calculator', theme: ['#4ade80', '#15803d'] },
-    { name: 'Bridge House site', url: 'https://bridgehouseinvite.siplyapp.co.uk/', image: 'bridge-house.svg' },
+    { name: 'Audiobookshelf', url: 'https://audiobooks.jrapp.co.uk', logo: 'audiobookshelf.svg' },
+    { name: 'Bridge House Invite', url: 'https://bridgehouseinvite.siplyapp.co.uk/', image: 'bridge-house.svg' },
   ] },
 ];
 
@@ -41,7 +41,7 @@ const GLYPHS = {
   shield: '<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.3 7.5 9.5 4.3-1.2 7.5-4.9 7.5-9.5V6Z"/><path d="m9 12 2.2 2.2L15.5 10"/>',
 };
 
-const FEATURED = { home: 'jellyfin', web: 'audiobookshelf' };
+const FEATURED = { home: 'jellyfin', web: 'jellyfin' };
 const MODES = {
   home: { note: 'opens on your home Wi-Fi', away: 'Not reachable. Are you on your home Wi-Fi?' },
   web: { note: 'works from anywhere', away: 'Nothing reachable. Check your connection.' },
