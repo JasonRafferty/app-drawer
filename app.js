@@ -104,7 +104,7 @@ function folderHtml(folder) {
 // --- render --------------------------------------------------------------------------
 function render() {
   const list = ordered(itemsFor(mode));
-  const featured = list.find((item) => !item.children && pins.has(item.id)) || list.find((item) => item.id === FEATURED[mode]);
+  const featured = list.find((item) => item.id === FEATURED[mode]);
   const items = featured ? [featured, ...list.filter((item) => item !== featured)] : list;
   grid.innerHTML = items.map((item) => item.children ? folderHtml(item) : tileHtml(item, item === featured)).join('');
   grid.querySelectorAll('.drawer-item').forEach((tile) => {
