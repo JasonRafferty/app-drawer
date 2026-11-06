@@ -2,6 +2,7 @@
 const APPS = [
   { id: 'tally', name: 'Tally', desc: 'Shared shopping lists and to-dos', image: 'tally.svg', web: { url: 'https://tally.jrapp.co.uk' } },
   { id: 'simmer', name: 'Simmer', desc: 'Shared recipes and weekly meal plans', image: 'simmer.svg', web: { url: 'https://simmer.jrapp.co.uk' } },
+  { id: 'writing-desk', name: 'Writing Desk', desc: 'Wah sends passages, Jason edits them', image: 'writing-desk.svg', web: { url: 'https://desk.jrapp.co.uk' } },
   { id: 'audiobookshelf', name: 'Audiobookshelf', logo: 'audiobookshelf.svg', theme: ['#f59e0b', '#c2410c'], home: { url: 'http://192.168.0.35:13378', desc: 'Use this for uploads over 100 MB' } },
   { id: 'jellyfin', name: 'Jellyfin', desc: 'Films and TV library', logo: 'jellyfin.svg', theme: ['#7b4dff', '#2fa6ff'], home: { url: 'http://192.168.0.35:8096' }, web: { url: 'https://jellyfin.jrapp.co.uk', desc: 'Watch from anywhere' } },
   { id: 'pihole', name: 'Pi-hole', desc: 'DNS and network controls', logo: 'pi-hole.svg', home: { url: 'http://192.168.0.35/admin' } },
